@@ -17,18 +17,27 @@ router.get("/", async (req, res, next) => {
 });
 
 // GET /companies/[code]
-// Return obj of company: {company: {code, name, description}}
+// Return obj of company: {company: {code, name, description, invoices: [id, ...]}}
 // If the company given cannot be found, this should return a 404 status response.
 router.get("/:code", async (req, res, next) => {
   try {
     const { code } = req.params;
-    const results = await db.query("SELECT * FROM companies WHERE code = $1", [
-      code,
-    ]);
-    if (results.rows.length === 0) {
+    const compResults = await db.query(
+      "SELECT * FROM companies WHERE code = $1",
+      [code]
+    );
+    if (compResults.rows.length === 0) {
       throw new ExpressError(`Can't find user with code of ${code}`, 404);
     }
-    return res.send({ company: results.rows[0] });
+    const invResults = await db.query(
+      "SELECT id FROM invoices WHERE comp_code = $1",
+      [code]
+    );
+    const company = compResults.rows[0];
+    const invoices = invResults.rows;
+    company.invoices = invoices.map((inv) => inv.id);
+
+    return res.send({ company: company });
   } catch (e) {
     return next(e);
   }
