@@ -45,9 +45,9 @@ describe("GET /companies/:code", () => {
 });
 
 describe("POST /companies", () => {
-  test("Creates a single company", async () => {
+  test("Creates a single company, tests slugify", async () => {
     const res = await request(app).post("/companies").send({
-      code: "turbo",
+      code: "Turbo!",
       name: "Turbo Tax",
       description: "Great company for taxes",
     });
