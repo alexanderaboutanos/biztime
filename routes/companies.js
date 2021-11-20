@@ -18,7 +18,8 @@ router.get("/", async (req, res, next) => {
 });
 
 // GET /companies/[code]
-// Return obj of company: {company: {code, name, description, invoices: [id, ...]}}
+// Return obj of company:
+//     {company: {code, name, description, invoices: [id, ...], industries: [industry, ...]}}
 // If the company given cannot be found, this should return a 404 status response.
 router.get("/:code", async (req, res, next) => {
   try {
@@ -34,9 +35,23 @@ router.get("/:code", async (req, res, next) => {
       "SELECT id FROM invoices WHERE comp_code = $1",
       [code]
     );
+    const indResults = await db.query(
+      `
+      SELECT i.industry
+        FROM industries AS i
+          LEFT JOIN companies_industries AS ci 
+            ON i.code = ci.ind_code
+          LEFT JOIN companies AS c
+           ON c.code = ci.comp_code
+        WHERE c.code = $1;`,
+      [code]
+    );
     const company = compResults.rows[0];
+
     const invoices = invResults.rows;
+    const industries = indResults.rows;
     company.invoices = invoices.map((inv) => inv.id);
+    company.industries = industries.map((ind) => ind.industry);
 
     return res.send({ company: company });
   } catch (e) {
