@@ -36,6 +36,7 @@ describe("GET /companies/:code", () => {
     const res = await request(app).get(`/companies/${testCompany.code}`);
     expect(res.statusCode).toBe(200);
     testCompany.invoices = [];
+    testCompany.industries = [];
     expect(res.body).toEqual({ company: testCompany });
   });
   test("Responds with 404 for invalid code", async () => {
@@ -62,27 +63,10 @@ describe("POST /companies", () => {
   });
 });
 
-// describe("PATCH /users/:id", () => {
-//   test("Updates a single user", async () => {
-//     const res = await request(app)
-//       .patch(`/users/${testUser.id}`)
-//       .send({ name: "BillyBob", type: "admin" });
-//     expect(res.statusCode).toBe(200);
-//     expect(res.body).toEqual({
-//       user: { id: testUser.id, name: "BillyBob", type: "admin" },
-//     });
-//   });
-//   test("Responds with 404 for invalid id", async () => {
-//     const res = await request(app)
-//       .patch(`/users/0`)
-//       .send({ name: "BillyBob", type: "admin" });
-//     expect(res.statusCode).toBe(404);
-//   });
-// });
-// describe("DELETE /users/:id", () => {
-//   test("Deletes a single user", async () => {
-//     const res = await request(app).delete(`/users/${testUser.id}`);
-//     expect(res.statusCode).toBe(200);
-//     expect(res.body).toEqual({ msg: "DELETED!" });
-//   });
-// });
+describe("DELETE /companies/:code", () => {
+  test("Deletes a single company", async () => {
+    const res = await request(app).delete(`/companies/${testCompany.code}`);
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({ msg: "DELETED!" });
+  });
+});
